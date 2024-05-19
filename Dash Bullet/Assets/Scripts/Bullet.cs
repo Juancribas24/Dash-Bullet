@@ -23,6 +23,15 @@ public class Bullet : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        bulletPool.ReturnBullet(gameObject); // Regresar la bala al pool en caso de colisión
+        Debug.Log("Collision detected with: " + collision.gameObject.name);
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            PlayerHealth.Instance.TakeDamage(1); // Resta 1 punto de vida al jugador
+            bulletPool.ReturnBullet(gameObject);
+        }
+        else if (collision.gameObject.CompareTag("Boundary"))
+        {
+            bulletPool.ReturnBullet(gameObject);
+        }
     }
 }

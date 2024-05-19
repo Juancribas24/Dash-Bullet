@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 272101683345631845}
   - component: {fileID: 7457735314724702011}
   - component: {fileID: 3559508587190368120}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: StarPurple
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -143,7 +143,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}

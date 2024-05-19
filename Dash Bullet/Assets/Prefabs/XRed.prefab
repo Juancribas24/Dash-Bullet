@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7172482741320399811}
   - component: {fileID: 6655833807921495726}
   - component: {fileID: 2318845465692097999}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: XRed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8929644158628120269}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 961dbeee483735b418bea2d2f8d55610, type: 2}
   m_CullingMode: 0
@@ -165,7 +165,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}

@@ -8,6 +8,9 @@ public class PlayerMovDash : MonoBehaviour
     public float dashSpeed = 15f;
     public float dashDuration = 0.2f;
     public float dashCooldown = 1f;
+    public ParticleSystem bulletParticleSystem;
+
+    public float enCollider = 0.5f;
 
     private Vector2 moveDirection;
     private bool canDash = true;
@@ -17,6 +20,20 @@ public class PlayerMovDash : MonoBehaviour
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private TrailRenderer tr;
     [SerializeField] private Animator animator;
+    [SerializeField] private Collider2D playerCollider;
+
+    private Vector2 screenBounds;
+    private float playerWidth;
+    private float playerHeight;
+
+
+    private void Start()
+    {
+        // Calcular los límites de la pantalla
+        screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z));
+        playerWidth = spriteRenderer.bounds.extents.x; // La mitad del ancho del jugador
+        playerHeight = spriteRenderer.bounds.extents.y; // La mitad del alto del jugador
+    }
 
     private void Update()
     {
@@ -41,6 +58,7 @@ public class PlayerMovDash : MonoBehaviour
         }
 
         Move();
+        ClampPosition();
     }
 
     void ProcessInputs()
@@ -59,6 +77,8 @@ public class PlayerMovDash : MonoBehaviour
     {
         canDash = false;
         isDashing = true;
+
+        playerCollider.enabled = false;
 
         // Calculate dash velocity
         Vector2 dashVelocity = moveDirection * dashSpeed;
@@ -79,7 +99,11 @@ public class PlayerMovDash : MonoBehaviour
         isDashing = false;
         animator.SetBool("Dash", isDashing);
 
+        yield return new WaitForSeconds(enCollider);
+        playerCollider.enabled = true;
+
         yield return new WaitForSeconds(dashCooldown);
+        
         canDash = true;
     }
 
@@ -102,4 +126,13 @@ public class PlayerMovDash : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, 0, 180);
         }
     }
+
+    void ClampPosition()
+    {
+        Vector3 pos = transform.position;
+        pos.x = Mathf.Clamp(pos.x, -screenBounds.x + playerWidth, screenBounds.x - playerWidth);
+        pos.y = Mathf.Clamp(pos.y, -screenBounds.y + playerHeight, screenBounds.y - playerHeight);
+        transform.position = pos;
+    }
+
 }

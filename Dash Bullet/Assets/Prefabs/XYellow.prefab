@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8896363881396875163}
   - component: {fileID: 9179327968820259391}
   - component: {fileID: 14900710874590708}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: XYellow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4917841884475289292}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 59b5badbb420ad541bc9fa0b6265274b, type: 2}
   m_CullingMode: 0
@@ -165,7 +165,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
