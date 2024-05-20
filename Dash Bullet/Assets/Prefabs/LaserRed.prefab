@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 9087479044207108436}
   m_Layer: 0
   m_Name: LaserRed
-  m_TagString: Untagged
+  m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -171,3 +171,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a658bccc9223ce45bb6295f745e319e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  owner: {fileID: 0}
+  damage: 1

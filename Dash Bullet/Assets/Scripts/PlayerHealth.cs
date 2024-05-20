@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -8,6 +10,8 @@ public class PlayerHealth : MonoBehaviour
 
     public int maxHealth = 10;
     private int currentHealth;
+
+    public event Action<int> OnHealthChanged; // Evento para notificar el cambio de salud
 
     void Awake()
     {
@@ -29,12 +33,14 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(int damage)
     {
         currentHealth -= damage;
-        Debug.Log("Player Health: " + currentHealth);
+        OnHealthChanged?.Invoke(currentHealth); // Notificar el cambio de salud
+        
 
         if (currentHealth <= 0)
         {
             // Manejar la muerte del jugador aquí
-            Debug.Log("Player is dead!");
+            StartCoroutine(GameOver());
+            
         }
     }
 
@@ -45,11 +51,20 @@ public class PlayerHealth : MonoBehaviour
         {
             currentHealth = maxHealth;
         }
-        Debug.Log("Player Health: " + currentHealth);
+        OnHealthChanged?.Invoke(currentHealth); // Notificar el cambio de salud
+        
     }
 
     public int GetCurrentHealth()
     {
         return currentHealth;
+    }
+
+    private IEnumerator GameOver()
+    {
+        Time.timeScale = 0f; // Detener el tiempo
+        yield return new WaitForSecondsRealtime(2f); // Esperar 2 segundos en tiempo real
+        Time.timeScale = 1f; // Restablecer el tiempo
+        SceneManager.LoadScene("Menu"); // Cambiar a la escena del menú
     }
 }

@@ -19,20 +19,42 @@ public class PlayerMovDash : MonoBehaviour
     [SerializeField] private Rigidbody2D rb;
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private TrailRenderer tr;
-    [SerializeField] private Animator animator;
+    //[SerializeField] private Animator animator;
     [SerializeField] private Collider2D playerCollider;
 
     private Vector2 screenBounds;
     private float playerWidth;
     private float playerHeight;
 
+    public Enemy enemy; // Referencia al script del enemigo
+
+    public RectTransform leftPanel; // Panel izquierdo
+    public RectTransform rightPanel; // Panel derecho
 
     private void Start()
     {
-        // Calcular los límites de la pantalla
-        screenBounds = Camera.main.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, Camera.main.transform.position.z));
+        // Calcular los límites de la pantalla, considerando los bordes negros
+        Camera mainCamera = Camera.main;
+        float cameraHeight = mainCamera.orthographicSize * 2;
+        float cameraWidth = cameraHeight * mainCamera.aspect;
+
+        // Obtener las dimensiones de los paneles en unidades del mundo
+        float leftPanelWidth = ConvertToWorldUnits(leftPanel);
+        float rightPanelWidth = ConvertToWorldUnits(rightPanel);
+
+        float screenWidthWithoutPanels = cameraWidth - (leftPanelWidth + rightPanelWidth);
+
+        screenBounds = new Vector2(screenWidthWithoutPanels / 2, cameraHeight / 2);
+
         playerWidth = spriteRenderer.bounds.extents.x; // La mitad del ancho del jugador
         playerHeight = spriteRenderer.bounds.extents.y; // La mitad del alto del jugador
+    }
+
+    private float ConvertToWorldUnits(RectTransform rectTransform)
+    {
+        // Convertir las dimensiones del RectTransform a unidades del mundo
+        float canvasScaleFactor = rectTransform.GetComponentInParent<Canvas>().scaleFactor;
+        return rectTransform.rect.width * canvasScaleFactor / 100f; // Convertir a unidades del mundo
     }
 
     private void Update()
@@ -85,11 +107,13 @@ public class PlayerMovDash : MonoBehaviour
         rb.velocity = dashVelocity;
 
         // Play dash animation
-        AdjustDashAnimationDirection();
-        animator.SetBool("Dash", isDashing);
+        //AdjustDashAnimationDirection();
+        //animator.SetBool("Dash", isDashing);
 
         // Enable trail renderer
         tr.emitting = true;
+
+        enemy.IncreaseBulletSpeed();
 
         yield return new WaitForSeconds(dashDuration);
 
@@ -97,13 +121,13 @@ public class PlayerMovDash : MonoBehaviour
         tr.emitting = false;
         rb.velocity = Vector2.zero;
         isDashing = false;
-        animator.SetBool("Dash", isDashing);
+        //animator.SetBool("Dash", isDashing);
 
         yield return new WaitForSeconds(enCollider);
         playerCollider.enabled = true;
 
         yield return new WaitForSeconds(dashCooldown);
-        
+
         canDash = true;
     }
 
@@ -134,5 +158,4 @@ public class PlayerMovDash : MonoBehaviour
         pos.y = Mathf.Clamp(pos.y, -screenBounds.y + playerHeight, screenBounds.y - playerHeight);
         transform.position = pos;
     }
-
 }

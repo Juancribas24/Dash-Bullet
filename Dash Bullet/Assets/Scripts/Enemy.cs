@@ -1,16 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Entities;
-using Unity.Mathematics;
-using Unity.Transforms;
 using System.Threading.Tasks;
 using UnityEngine;
-using Unity.VisualScripting;
 
 public class Enemy : MonoBehaviour
 {
     public BulletPool bulletPool; // Referencia al pool de balas
-    public float bulletSpeed = 5.0f; // Velocidad de la bala
+    public float bulletSpeed = 3.0f; // Velocidad de la bala
     public Transform player;
 
     public ParticleSystem bulletParticleSystem;
@@ -22,12 +18,13 @@ public class Enemy : MonoBehaviour
     // Tiempo que cada patrón debe durar
     public float patternDuration = 10.0f;
 
-    private EntityManager entityManager;
-    private Entity bulletPrefabEntity;
+    private AudioSource audioSource;
 
     private void Start()
     {
-         attackPatterns = new List<IEnumerator>
+        audioSource = GetComponent<AudioSource>();
+
+        attackPatterns = new List<IEnumerator>
         {
             SurroundPattern(),
             SpiralPattern(),
@@ -47,7 +44,6 @@ public class Enemy : MonoBehaviour
 
     public IEnumerator SwitchPatterns()
     {
-        int patternIndex = 0;
         while (true)
         {
             // Detener el patrón actual si hay uno corriendo
@@ -56,23 +52,21 @@ public class Enemy : MonoBehaviour
                 StopCoroutine(currentPatternCoroutine);
             }
 
-            // Iniciar el siguiente patrón
+            // Seleccionar un patrón de ataque aleatorio
+            int patternIndex = UnityEngine.Random.Range(0, attackPatterns.Count);
             currentPatternCoroutine = StartCoroutine(attackPatterns[patternIndex]);
 
             // Esperar un tiempo antes de cambiar al siguiente patrón
             yield return new WaitForSeconds(patternDuration); // Usar el tiempo configurado para cada patrón
-
-            // Cambiar al siguiente patrón
-            patternIndex = (patternIndex + 1) % attackPatterns.Count;
         }
     }
 
     public IEnumerator SurroundPattern() //Check
     {
-        float radius = 5.0f;
+        float radius = 1.0f;
         while (true)
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 20; i++)
             {
                 float angle = (360f / 10) * i;
                 Vector2 direction = new Vector2(
@@ -85,9 +79,14 @@ public class Enemy : MonoBehaviour
                 {
                     bullet.transform.position = transform.position;
                     bullet.GetComponent<Rigidbody2D>().velocity = direction * bulletSpeed;
+                    if (audioSource != null)
+                    {
+                        audioSource.PlayOneShot(audioSource.clip); // Reproducir el sonido de disparo
+                    }
                 }
             }
             yield return new WaitForSeconds(1.0f);
+            
         }
     }
 
@@ -98,7 +97,7 @@ public class Enemy : MonoBehaviour
         float angleIncrement = 10f; // Ajusta el incremento del ángulo según sea necesario
         while (true)
         {
-            for (int i = 0; i < 36; i++) // 36 balas para una espiral completa
+            for (int i = 0; i < 15; i++) // 36 balas para una espiral completa
             {
                 Vector2 direction = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
                 GameObject bullet = bulletPool.GetBullet("BulletType2");
@@ -106,19 +105,25 @@ public class Enemy : MonoBehaviour
                 {
                     bullet.transform.position = transform.position;
                     bullet.GetComponent<Rigidbody2D>().velocity = direction * bulletSpeed;
+
+                    if (audioSource != null)
+                    {
+                        audioSource.PlayOneShot(audioSource.clip); // Reproducir el sonido de disparo
+                    }
                 }
                 angle += angleIncrement;
             }
             yield return new WaitForSeconds(0.5f); // Intervalo entre disparos
-            Debug.Log("Spiral");
+            
+
         }
     }
 
     public IEnumerator FlowerPattern()
     {
         int totalPetals = 6;
-        int bulletsPerPetal = 10;
-        float radius = 2.0f;
+        int bulletsPerPetal = 12;
+        float radius = 1.0f;
         while (true)
         {
             for (int p = 0; p < totalPetals; p++)
@@ -133,11 +138,16 @@ public class Enemy : MonoBehaviour
                     {
                         bullet.transform.position = transform.position + (Vector3)(direction * radius);
                         bullet.GetComponent<Rigidbody2D>().velocity = direction * bulletSpeed;
+
+                        if (audioSource != null)
+                        {
+                            audioSource.PlayOneShot(audioSource.clip); // Reproducir el sonido de disparo
+                        }
                     }
                 }
             }
             yield return new WaitForSeconds(1.0f); // Intervalo entre disparos
-            Debug.Log("Flower");
+          
         }
     }
     public IEnumerator VariableAnglePattern()
@@ -157,6 +167,11 @@ public class Enemy : MonoBehaviour
             {
                 bullet.transform.position = transform.position;
                 bullet.GetComponent<Rigidbody2D>().velocity = direction * bulletSpeed;
+
+                if (audioSource != null)
+                {
+                    audioSource.PlayOneShot(audioSource.clip); // Reproducir el sonido de disparo
+                }
             }
 
             if (angle >= maxAngle || angle <= -maxAngle)
@@ -174,7 +189,7 @@ public class Enemy : MonoBehaviour
             }
 
             yield return new WaitForSeconds(0.3f);
-            Debug.Log("VariableAngle");
+           
         }
     }
     public IEnumerator WallBouncePattern()
@@ -185,18 +200,23 @@ public class Enemy : MonoBehaviour
             if (bullet != null)
             {
                 bullet.transform.position = transform.position;
-                bullet.GetComponent<Rigidbody2D>().velocity = transform.up * bulletSpeed;
+                bullet.GetComponent<Rigidbody2D>().velocity = -transform.up * bulletSpeed;
+
+                if (audioSource != null)
+                {
+                    audioSource.PlayOneShot(audioSource.clip); // Reproducir el sonido de disparo
+                }
             }
-            yield return new WaitForSeconds(1.0f);
-            Debug.Log("WallBounce");
+            yield return new WaitForSeconds(0.05f);
+            
         }
     }
 
     public IEnumerator StarPattern()
     {
-        int points = 5;
-        int bulletsPerPoint = 3;
-        float angleOffset = 0f;
+        int points = 10;
+        int bulletsPerPoint = 2;
+        float angleOffset = 45f;
         while (true)
         {
             for (int p = 0; p < points; p++)
@@ -211,21 +231,26 @@ public class Enemy : MonoBehaviour
                     {
                         bullet.transform.position = transform.position;
                         bullet.GetComponent<Rigidbody2D>().velocity = direction * bulletSpeed;
+
+                        if (audioSource != null)
+                        {
+                            audioSource.PlayOneShot(audioSource.clip); // Reproducir el sonido de disparo
+                        }
                     }
                 }
             }
             angleOffset += 5f; // Ajusta el ángulo de desplazamiento para cada nuevo disparo
-            yield return new WaitForSeconds(0.5f); // Intervalo entre disparos
-            Debug.Log("Stars");
+            yield return new WaitForSeconds(1.0f); // Intervalo entre disparos
+           
         }
     }
 
     public IEnumerator TargetedPattern(Transform player)
     {
-        int totalBullets = 10;
+        int totalBullets = 20;
         float initialSpeed = 2.0f;
-        float acceleration = 0.5f; // Aceleración lineal
-        float duration = 3.0f; // Duración máxima de las balas antes de regresar al pool
+        float acceleration = 1f; // Aceleración lineal
+        float duration = 7.0f; // Duración máxima de las balas antes de regresar al pool
 
         while (true)
         {
@@ -239,10 +264,16 @@ public class Enemy : MonoBehaviour
                 {
                     bullet.transform.position = transform.position;
                     StartCoroutine(AccelerateBullet(bullet, direction, initialSpeed, acceleration, duration));
+
+                }
+                if (audioSource != null)
+                {
+                    audioSource.PlayOneShot(audioSource.clip); // Reproducir el sonido de disparo
                 }
                 yield return new WaitForSeconds(0.1f); // Pequeño intervalo entre disparos
             }
-            yield return new WaitForSeconds(2.0f); // Intervalo entre series de disparos
+            yield return new WaitForSeconds(0.5f); // Intervalo entre series de disparos
+            
         }
     }
 
@@ -270,9 +301,9 @@ public class Enemy : MonoBehaviour
         return await Task.Run(() =>
         {
             Vector2[] result = new Vector2[41];
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 35; i++)
             {
-                float x = -10.0f + 0.5f * i;
+                float x = -10.0f + 1f * i;
                 float y = amplitude * Mathf.Sin(frequency * x);
                 result[i] = new Vector2(x, y).normalized;
             }
@@ -283,8 +314,8 @@ public class Enemy : MonoBehaviour
     public IEnumerator WavePattern()
     {
         float amplitude = 2.5f;
-        float frequency = 2.0f;
-        float duration = 3.0f; // Duración máxima de las balas antes de regresar al pool
+        float frequency = 4f;
+        float duration = 8.0f; // Duración máxima de las balas antes de regresar al pool
 
         // Llamar al método asincrónico para precalcular direcciones
         var directionsTask = PrecalculateDirectionsAsync(amplitude, frequency);
@@ -310,6 +341,7 @@ public class Enemy : MonoBehaviour
                 }
             }
             yield return new WaitForSeconds(0.15f); // Intervalo entre disparos
+            
         }
     }
 
@@ -333,14 +365,14 @@ public class Enemy : MonoBehaviour
     {
         float angle1 = 0f;
         float angle2 = 180f;
-        float angleIncrement = 10f; // Ajusta el incremento del ángulo según sea necesario
-        int totalBullets = 36; // Número total de balas en la espiral
+        int totalBullets = 14; // Número total de balas en la espiral
 
         // Precalcular direcciones para una vuelta completa
         Vector2[] directions1 = new Vector2[totalBullets];
         Vector2[] directions2 = new Vector2[totalBullets];  
         for (int i = 0; i < totalBullets; i++)
         {
+            float angleIncrement = 10f; // Ajusta el incremento del ángulo según sea necesario
             float angleRad1 = (angle1 + angleIncrement * i) * Mathf.Deg2Rad;
             float angleRad2 = (angle2 + angleIncrement * i) * Mathf.Deg2Rad;
             directions1[i] = new Vector2(Mathf.Cos(angleRad1), Mathf.Sin(angleRad1));
@@ -365,17 +397,22 @@ public class Enemy : MonoBehaviour
                     bullet2.transform.position = transform.position;
                     bullet2.GetComponent<Rigidbody2D>().velocity = directions2[i] * bulletSpeed;
                 }
+                if (audioSource != null)
+                {
+                    audioSource.PlayOneShot(audioSource.clip); // Reproducir el sonido de disparo
+                }
             }
 
             yield return new WaitForSeconds(0.15f); // Intervalo entre disparos
+            
         }
     }
 
     public IEnumerator SpinningLaserPattern()
     {
         int totalLasers = 8;
-        float rotationSpeed = 360.0f / 2.0f; // 360 grados en 2 segundos
-        float duration = 2.0f; // Duración de los láseres
+        float rotationSpeed = 360.0f / 3.0f; // 360 grados en 3 segundos
+        float duration = 3.0f; // Duración de los láseres
         float waitTime = 0.1f; // Intervalo entre disparos
 
         while (true)
@@ -387,6 +424,7 @@ public class Enemy : MonoBehaviour
                 yield return new WaitForSeconds(waitTime); // Pequeño intervalo entre disparos
             }
             yield return new WaitForSeconds(2.0f); // Intervalo entre series de disparos
+            
         }
     }
 
@@ -406,9 +444,13 @@ public class Enemy : MonoBehaviour
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
-
+            
             bulletPool.ReturnBullet(laser);
         }
     }
 
+    public void IncreaseBulletSpeed()
+    {
+        bulletSpeed += 0.5f;
+    }
 }
