@@ -28,35 +28,6 @@ public class PlayerMovDash : MonoBehaviour
 
     public Enemy enemy; // Referencia al script del enemigo
 
-    public RectTransform leftPanel; // Panel izquierdo
-    public RectTransform rightPanel; // Panel derecho
-
-    private void Start()
-    {
-        // Calcular los límites de la pantalla, considerando los bordes negros
-        Camera mainCamera = Camera.main;
-        float cameraHeight = mainCamera.orthographicSize * 2;
-        float cameraWidth = cameraHeight * mainCamera.aspect;
-
-        // Obtener las dimensiones de los paneles en unidades del mundo
-        float leftPanelWidth = ConvertToWorldUnits(leftPanel);
-        float rightPanelWidth = ConvertToWorldUnits(rightPanel);
-
-        float screenWidthWithoutPanels = cameraWidth - (leftPanelWidth + rightPanelWidth);
-
-        screenBounds = new Vector2(screenWidthWithoutPanels / 2, cameraHeight / 2);
-
-        playerWidth = spriteRenderer.bounds.extents.x; // La mitad del ancho del jugador
-        playerHeight = spriteRenderer.bounds.extents.y; // La mitad del alto del jugador
-    }
-
-    private float ConvertToWorldUnits(RectTransform rectTransform)
-    {
-        // Convertir las dimensiones del RectTransform a unidades del mundo
-        float canvasScaleFactor = rectTransform.GetComponentInParent<Canvas>().scaleFactor;
-        return rectTransform.rect.width * canvasScaleFactor / 100f; // Convertir a unidades del mundo
-    }
-
     private void Update()
     {
         if (isDashing)
@@ -80,7 +51,7 @@ public class PlayerMovDash : MonoBehaviour
         }
 
         Move();
-        ClampPosition();
+        
     }
 
     void ProcessInputs()
@@ -151,11 +122,4 @@ public class PlayerMovDash : MonoBehaviour
         }
     }
 
-    void ClampPosition()
-    {
-        Vector3 pos = transform.position;
-        pos.x = Mathf.Clamp(pos.x, -screenBounds.x + playerWidth, screenBounds.x - playerWidth);
-        pos.y = Mathf.Clamp(pos.y, -screenBounds.y + playerHeight, screenBounds.y - playerHeight);
-        transform.position = pos;
-    }
 }
